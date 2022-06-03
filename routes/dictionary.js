@@ -1,40 +1,20 @@
 var express = require('express');
 var router = express.Router();
-var dictionary = require('./dictionary.js');
-// const fetch = require('node-fetch')
+const axios = require ("axios");
 
-router.get('/', (req, res) => {
-    res.render('main', {
-        data: null,
-         audio: null,
-    })
-})
 
-router.post('/', async (req, res) => {
-    const word = req.body.word
+router.get('/', async (req, res) => {
+    const word = req.query.word
     const api_url = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
 
     try {
-      await fetch(api_url)
-        .then(res => res.json())
-        .then(data => {
-            if(data.title === 'No Definitions Found'){
-                res.render('main', {
-                    data: data.title,
-                    audio: null
-                })
-            }else{
-                const audio = data[0].phonetics[0].audio
-        
-                res.render('main',{data: data[0], audio})
-            }
+      axios.get(api_url)      
+        .then(function(response){
+            res.json(JSON.stringify(response.data));
         })
     } catch (err) {
-        res.render('main', {
-            data: 'Something went wrong!!!',
-            audio: null,
-        })
+      console.error(err)
     }
 })
 
-module.exports = dictionary
+module.exports = router
