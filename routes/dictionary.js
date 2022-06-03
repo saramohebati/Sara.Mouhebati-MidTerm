@@ -4,17 +4,25 @@ const axios = require("axios");
 
 
 router.get('/', async (req, res) => {
-    const word = req.query.word
-    const api_url = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
-
-    try {
-        axios.get(api_url)
-            .then(function (response) {
-                res.json(JSON.stringify(response.data));
-            })
-    } catch (err) {
-        console.error(err)
+    const words = req.query.word;
+    // console.log(words)
+    var result = {};
+    for (let word of words) {
+        // console.log(word)
+        const api_url = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+        try {
+            await axios.get(api_url)
+                .then(function (response) {
+                    // console.log(JSON.parse(response.data).meanings)
+                console.log(response.data[0].meanings)
+                    result[word] = response.data[0].meanings;
+                })
+        } catch (err) {
+            console.error(err)
+        }
     }
+    // console.log(result)
+    res.json(JSON.stringify(result));
 })
 
 module.exports = router
